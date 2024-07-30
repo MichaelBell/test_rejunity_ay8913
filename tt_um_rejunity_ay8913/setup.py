@@ -24,8 +24,8 @@ def setup(tt:DemoBoard):
     
     tt.reset_project(True)
     #tt.clock_project_PWM(1.79e6)
-    platform.set_RP_system_clock(126e6)
-    tt.clock_project_PWM(2e6)
+    platform.set_RP_system_clock(128e6)
+    tt.clock_project_PWM(32e6)
 
     tt.reset_project(False)
     

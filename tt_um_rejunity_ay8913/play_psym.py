@@ -67,7 +67,7 @@ def playLoopOO(reader:PsYMReader, chip):
     
     
 def playLoop(reader:PsYMReader, chip):
-    delayMs = int(1000/reader.samplerateHz)
+    delayUs = int(1000000/reader.samplerateHz)
     while reader.samples_left:
         tnow = time.ticks_us()
         next_reg_settings = reader.next_registers_list()
@@ -76,9 +76,9 @@ def playLoop(reader:PsYMReader, chip):
         for reg in next_reg_settings:
             chip.set_register(reg[0], reg[1])
         #log.info('-')
-        msToWait = int(delayMs - ((time.ticks_us() - tnow)/1000))
+        usToWait = int(delayUs - (time.ticks_us() - tnow))
         #print(msToWait)
-        if msToWait > 0:
-            time.sleep_ms(msToWait) 
+        if usToWait > 0:
+            time.sleep_us(usToWait) 
     return True
     

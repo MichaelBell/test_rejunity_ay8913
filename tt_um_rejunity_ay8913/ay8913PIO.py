@@ -38,35 +38,16 @@ log = logging.getLogger(__name__)
              sideset_init=(PIO.OUT_LOW,)*2,
              out_init=(PIO.OUT_LOW,)*4 + (PIO.IN_LOW,)*4 + (PIO.OUT_LOW,)*4)
 def ay8913writer():
-    # this implementation is redundant and sub-optimal
-    # all the nops and duplicate .side() settings are 
-    # probably not required but it was a bit of a pain
-    # to get working, and this does work with a statemachine 
-    # freq of 2MHz... from uPython, I can set registers with 
-    # this in about 40us (down from close to 8 milliseconds!)
-    # so I'm good with it for now
+    # this implementation is significantly simplified but
+    # only works if you run the PIO a bunch slower than the project
+    # clock - but I'm running the project at 32MHz to get a clean PWM out
+    # for the audio Pmod so that's fine
     out(isr, 8)         .side(0)
     in_(isr, 4)         .side(0b11)
     mov(pins, isr)      .side(0b11)
-    nop().side(0b11)
-    nop().side(0b11)
-    nop().side(0b11)
-    nop().side(0b11)
     out(isr, 8)         .side(0)
-    nop().side(0)
     in_(isr, 4)         .side(0b10)
-    mov(pins, isr)      .side(0b10)
-    nop()
-    nop()
-    nop()
-    nop().side(0)
-    nop().delay(3)
-    nop()
-    nop()
-    nop()
-    nop()
-    nop()
-    nop()
+    mov(pins, isr)      .side(0b10).delay(3)
 
 
 
@@ -92,7 +73,7 @@ class AY8913PIO:
         self.tt.bidir_mode = [Pins.OUT, Pins.OUT, Pins.OUT, Pins.OUT, 
                               Pins.IN,  Pins.IN,  Pins.IN,  Pins.IN]
         
-        self.tt.bidir_byte = 0
+        self.tt.bidir_byte = 8
         
         # now hand over control of the tt.in* pins and the two first
         # bidirs to the PIO state machine
